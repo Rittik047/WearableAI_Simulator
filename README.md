@@ -1,6 +1,6 @@
 # Wearable AI Explorer
 
-Interactive companion to the BMEN 6367 paper presentation on: [Wearable AI Simulator] (https://rittik047.github.io/WearableAI_Simulator/)
+Interactive companion to the BMEN 6367 paper presentation on: [Wearable AI Simulator](https://rittik047.github.io/WearableAI_Simulator/)
 
 > Huang G, Chen X, Liao C. **AI-Driven Wearable Bioelectronics in Digital Healthcare.** *Biosensors* 2025, 15(7), 410. [doi:10.3390/bios15070410](https://doi.org/10.3390/bios15070410)
 
