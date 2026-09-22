@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Wearable AI Explorer</title>
+<meta name="description" content="Interactive companion to Huang, Chen &amp; Liao, Biosensors 2025: episodic vs continuous sensing, what a positive alert from the Table 5 AI systems means (PPV), and how power budgets set wearable battery life.">
+<meta name="author" content="Rittik Patra">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFBF9">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101613">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wearable AI Explorer">
+<meta property="og:description" content="Interactive companion to Huang, Chen &amp; Liao, Biosensors 2025: episodic vs continuous sensing, what a positive alert from the Table 5 AI systems means (PPV), and how power budgets set wearable battery life.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script>/* apply a saved theme choice before first paint */try{var t=localStorage.getItem("wax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<script src="assets/explorer.js" defer></script>
+</head>
+<body>
+<noscript><p class="noscript">The charts and sliders on this page need JavaScript. Please enable it and reload.</p></noscript>
+<div class="wrap">
+<header>
+  <div class="kicker">BMEN 6367 · companion to the paper presentation</div>
+  <h1>Wearable AI Explorer</h1>
+  <p class="lede">Three hands-on models built from numbers reported in Huang, Chen &amp; Liao's review. Move the sliders to see why continuous sensing matters, what a "positive" alert from an AI system really means, and how power budgets decide whether on-body AI can run for hours or years.</p>
+  <p class="cite">Source paper: Huang G, Chen X, Liao C. <i>AI-Driven Wearable Bioelectronics in Digital Healthcare.</i> Biosensors 2025, 15(7), 410. <a href="https://doi.org/10.3390/bios15070410">doi:10.3390/bios15070410</a>. Models are illustrative teaching tools; assumptions are listed under each one.</p>
+  <div class="navrow">
+    <nav class="jump" aria-label="Sections">
+      <a href="#sampling">1 · Episodic vs continuous sensing</a>
+      <a href="#screening">2 · What a positive alert means</a>
+      <a href="#power">3 · Power budget → battery life</a>
+    </nav>
+    <button class="theme-btn" id="themeBtn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75a6.25 6.25 0 0 1 0 12.5z" fill="currentColor"/></svg><span>Theme: Auto</span></button>
+  </div>
+</header>
+
+<!-- ============ 1. SAMPLING ============ -->
+<section class="bench" id="sampling" aria-labelledby="h-sampling">
+  <div class="bench-head">
+    <span class="tag">Background · slide 2</span>
+    <h2 id="h-sampling">How often do you have to look to catch a paroxysmal episode?</h2>
+    <p>Intermittent events such as paroxysmal atrial fibrillation or nocturnal hypoglycemia come and go. The review's premise is that episodic clinic visits miss them; this model puts numbers on that claim.</p>
+  </div>
+  <div class="grid2">
+    <div class="controls">
+      <div class="ctl"><label for="rate">Episodes per month <span class="val" id="rateV"></span></label><input id="rate" type="range" min="-1" max="1.3" step="0.01" value="0.3"></div>
+      <div class="ctl"><label for="dur">Episode length <span class="val" id="durV"></span></label><input id="dur" type="range" min="1" max="2.78" step="0.01" value="1.78"></div>
+      <div class="ctl"><label for="visits">Clinic ECG visits per year <span class="val" id="visitsV"></span></label><input id="visits" type="range" min="1" max="12" step="1" value="1"></div>
+      <div class="ctl"><label for="wear">Smartwatch wear time <span class="val" id="wearV"></span></label><input id="wear" type="range" min="30" max="100" step="1" value="80"></div>
+      <button id="resample" type="button">Simulate another year</button>
+    </div>
+    <div style="display:grid;gap:16px">
+      <div class="readouts" id="sampRO"></div>
+      <div class="chart" id="capChart"><p class="chart-title">Probability of recording at least one episode</p></div>
+      <div class="chart" id="yearChart"><p class="chart-title">One simulated year: episodes (ticks) and what each strategy records</p></div>
+      <div class="legend" id="yearLegend"></div>
+    </div>
+  </div>
+  <p class="note"><b>Model.</b> Episodes arrive at random (Poisson, rate λ) and last a fixed time <i>d</i>. A recording window of length <i>T</i> captures an episode if they overlap, so P(capture) = 1 − e<sup>−λ(T+d)</sup>. A 10-second clinic ECG is almost a point sample, so each visit catches an episode only with probability ≈ the fraction of time spent in one. Wear time is treated as one continuous block per year. Parameters are yours to set; they are not from the review.</p>
+</section>
+
+<!-- ============ 2. SCREENING ============ -->
+<section class="bench" id="screening" aria-labelledby="h-screen">
+  <div class="bench-head">
+    <span class="tag">Results · Table 5 · slides 17–18</span>
+    <h2 id="h-screen">Same sensitivity, very different meaning: what does a positive alert mean?</h2>
+    <p>Table 5 of the review reports sensitivity and specificity for eight deployed AI systems. Positive predictive value (PPV) also depends on how common the condition is among the people tested. Pick a system in the plot or table, then move the prevalence slider.</p>
+  </div>
+  <div class="grid-eq">
+    <div style="display:grid;gap:10px">
+      <div class="chart" id="rocChart"><p class="chart-title">Table 5 in ROC space (zoomed to the top-left corner)</p></div>
+      <div class="legend"><span><i class="sw" style="background:var(--s1)"></i>Point-of-care / consumer</span><span><i class="sw" style="background:var(--s2)"></i>Imaging / genomics</span><span><i class="sw" style="background:var(--zone);outline:1px dashed var(--zone-line)"></i>Authors' benchmark: Se ≥ 99 %, Sp ≥ 80 %</span></div>
+    </div>
+    <div style="display:grid;gap:14px">
+      <div class="controls">
+        <div class="ctl"><label for="sys">AI system (Table 5)</label><select id="sys"></select></div>
+        <div class="ctl"><label for="prev">Prevalence among people tested <span class="val" id="prevV"></span></label><input id="prev" type="range" min="-3" max="-0.3" step="0.01" value="-2"></div>
+        <div class="ctl"><label for="se">Sensitivity <span class="val" id="seV"></span></label><input id="se" type="range" min="50" max="99.9" step="0.1" value="90"></div>
+        <div class="ctl"><label for="sp">Specificity <span class="val" id="spV"></span></label><input id="sp" type="range" min="50" max="99.9" step="0.1" value="90"></div>
+      </div>
+      <div class="readouts" id="ppvRO"></div>
+    </div>
+  </div>
+  <div class="grid-eq">
+    <div class="chart" id="ppvChart"><p class="chart-title">PPV as prevalence changes (selected system highlighted)</p></div>
+    <div style="display:grid;gap:10px">
+      <p class="chart-title" style="margin:0">1,000 people screened at this prevalence</p>
+      <div class="icons" id="icons" role="img" aria-label="Icon array of 1,000 screened people"></div>
+      <div class="legend" id="iconLegend"></div>
+    </div>
+  </div>
+  <details><summary>Table 5 data (as reported in the review)</summary>
+    <div class="tbl-wrap"><table id="t5"><thead><tr><th>System</th><th>Task · data</th><th>Se %</th><th>Sp %</th><th>AUC</th><th>Setting</th></tr></thead><tbody></tbody></table></div>
+  </details>
+  <p class="note"><b>Formulas.</b> PPV = Se·p / (Se·p + (1−Sp)(1−p)); NPV = Sp(1−p) / (Sp(1−p) + (1−Se)p), with prevalence p. Sensitivity and specificity are assumed transportable to the new population, which rarely holds exactly (spectrum bias).</p>
+</section>
+
+<!-- ============ 3. POWER ============ -->
+<section class="bench" id="power" aria-labelledby="h-power">
+  <div class="bench-head">
+    <span class="tag">Methods · power · slide 9</span>
+    <h2 id="h-power">Power budget → battery life</h2>
+    <p>The review reports the power a wearable spends per analysis at each stage of the field's evolution. Dividing a battery's energy by that draw shows why edge AI and neuromorphic hardware matter.</p>
+  </div>
+  <div class="grid2">
+    <div class="controls">
+      <div class="ctl"><label for="mah">Battery capacity at 3.7 V <span class="val" id="mahV"></span></label><input id="mah" type="range" min="20" max="500" step="10" value="200"></div>
+      <div class="ctl"><label for="duty">Share of time the AI pipeline runs <span class="val" id="dutyV"></span></label><input id="duty" type="range" min="1" max="100" step="1" value="100"></div>
+      <div class="ctl"><span style="font-size:13px;font-weight:600">Highlight a power tier</span><div class="seg" id="tierSeg" role="group" aria-label="Power tier"></div></div>
+    </div>
+    <div style="display:grid;gap:16px">
+      <div class="readouts" id="powRO"></div>
+      <div class="chart" id="powChart"><p class="chart-title">Runtime on one charge (log scale)</p></div>
+    </div>
+  </div>
+  <p class="note"><b>Assumptions.</b> Constant average draw = tier power × duty share; energy = mAh × 3.7 V. Ignores sensors, radio bursts, voltage conversion losses and self-discharge, so real runtimes are shorter. Tier values from the review: 100 mW per analysis cycle for earlier cloud-dependent systems and &lt;5 mW with TinyML / spiking networks (§2), &lt;1 mW for continuous multi-analyte monitoring (§2), &lt;10 µW neuromorphic inference targeted for 2027–29 (§7).</p>
+</section>
+
+<footer>
+  <div>Built for the BMEN 6367 paper presentation by Rittik Patra. Data: Tables 4–5 and Sections 2, 3 and 7 of the review. The models are simplified for teaching and are not clinical tools.</div>
+</footer>
+</div>
+</body>
+</html>
